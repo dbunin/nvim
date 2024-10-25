@@ -135,7 +135,12 @@ M.general = {
     --   "Find implementations"
     -- },
     -- buffers
-    ["<leader>gg"] = { "<cmd> Neogit <CR>", "Open Neogit" },
+    ["<leader>gg"] = { function()
+      if vim.g.nvdash_displayed then
+        require("nvchad.tabufline").close_buffer()
+      end
+      vim.cmd "Neogit"
+    end, "Open Neogit" },
     -- database
     ["<leader>du"] = { "<cmd> DBUIToggle<CR>", "Toggle dadbod ui" },
 
