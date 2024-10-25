@@ -1,7 +1,7 @@
 ---@type ChadrcConfig
 local M = {
   base46 = {
-    theme = "chadracula-evondev",
+    theme = "catppuccin",
     hl_add = {},
     integrations = {},
     changed_themes = {
@@ -12,7 +12,7 @@ local M = {
       },
     },
     transparency = false,
-    theme_toggle = { "chadracula-evondev", "chadracula-evondev" },
+    theme_toggle = { "catppuccin", "catppuccin" },
   },
 
   nvdash = {
