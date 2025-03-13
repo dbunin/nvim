@@ -21,6 +21,9 @@ local prettier = {
   formatStdin = true,
 }
 
+local cljstyle = require('efmls-configs.formatters.cljstyle')
+local stylua = require('efmls-configs.formatters.stylua')
+
 local languages = {
   typescript = { prettier },
   javascript = { prettier },
@@ -33,6 +36,8 @@ local languages = {
   css = { prettier },
   markdown = { prettier },
   astro = { prettier },
+  lua = { stylua },
+  clojure = { cljstyle }
 }
 
 require("lsp-format").setup {}
@@ -80,6 +85,15 @@ local on_attach = function(client, bufnr)
 end
 
 local new_on_attach = function(client, bufnr)
+  on_attach(client, bufnr)
+
+  -- client.server_capabilities.documentFormattingProvider = true
+  -- client.server_capabilities.documentRangeFormattingProvider = true
+
+  -- require("lsp-format").on_attach(client)
+end
+
+local efm_on_attach = function(client, bufnr)
   on_attach(client, bufnr)
 
   client.server_capabilities.documentFormattingProvider = true
@@ -146,8 +160,11 @@ lspconfig.ts_ls.setup {
 
 lspconfig.efm.setup {
   capabilities = capabilities,
-  on_attach = new_on_attach,
-  init_options = { documentFormatting = true },
+  on_attach = efm_on_attach,
+  init_options = {
+    documentFormatting = true,
+    documentRangeFormatting = true,
+  },
   root_dir = vim.loop.cwd,
   filetypes = vim.tbl_keys(languages),
   settings = {
@@ -181,6 +198,33 @@ lspconfig["lua_ls"].setup {
         },
         maxPreload = 100000,
         preloadFileSize = 10000,
+      },
+    },
+  },
+}
+
+require('lspconfig').ruff.setup({
+  on_attach = function(client, bufnr)
+    client.server_capabilities.hoverProvider = false
+    on_attach(client, bufnr)
+  end,
+})
+
+require('lspconfig').basedpyright.setup {
+  on_attach = new_on_attach,
+  capabilities = capabilities,
+  settings = {
+    basedpyright = {
+      disableOrganizeImports = true,
+      disableTaggedHints = false,
+      analysis = {
+        typeCheckingMode = "standard",
+        useLibraryCodeForTypes = true, -- Analyze library code for type information
+        autoImportCompletions = true,
+        autoSearchPaths = true,
+        diagnosticSeverityOverrides = {
+          reportIgnoreCommentWithoutRule = true,
+        },
       },
     },
   },

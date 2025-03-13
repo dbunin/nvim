@@ -4,7 +4,7 @@ local overrides = require "configs.configs.overrides"
 local plugins = {
   -- Override plugin definition options
   { "lukas-reineke/indent-blankline.nvim", enabled = true },
-  { "folke/which-key.nvim",                enabled = true },
+  { "folke/which-key.nvim", enabled = true },
   {
     "neovim/nvim-lspconfig",
     dependencies = {
@@ -27,6 +27,11 @@ local plugins = {
       require "configs.lspconfig"
     end,
   },
+  {
+    "creativenull/efmls-configs-nvim",
+    version = "v1.x.x", -- version is optional, but recommended
+    dependencies = { "neovim/nvim-lspconfig" },
+  },
   -- overrde plugin configs
   {
     "nvim-telescope/telescope.nvim",
@@ -37,7 +42,7 @@ local plugins = {
         ["<C-j>"] = require("telescope.actions").move_selection_next,
         ["<C-k>"] = require("telescope.actions").move_selection_previous,
         ["<Esc>"] = require("telescope.actions").close,
-        ["<C-h>"] = "which_key"
+        ["<C-h>"] = "which_key",
       }
 
       return conf
@@ -47,7 +52,7 @@ local plugins = {
     "nvim-treesitter/nvim-treesitter",
     opts = overrides.treesitter,
     dependencies = {
-      'nkrkv/nvim-treesitter-rescript',
+      "nkrkv/nvim-treesitter-rescript",
     },
   },
   {
@@ -59,7 +64,7 @@ local plugins = {
     "dmmulroy/tsc.nvim",
     ft = { "typescript", "javascript" },
     config = function()
-      require("tsc").setup({
+      require("tsc").setup {
         auto_open_qflist = true,
         auto_close_qflist = false,
         enable_progress_notifications = true,
@@ -68,14 +73,14 @@ local plugins = {
         },
         hide_progress_notifications_from_history = true,
         spinner = { "⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷" },
-      })
+      }
     end,
   },
   {
-    'dmmulroy/ts-error-translator.nvim',
+    "dmmulroy/ts-error-translator.nvim",
     ft = { "typescript", "javascript" },
     config = function()
-      require('ts-error-translator').setup()
+      require("ts-error-translator").setup()
     end,
   },
   {
@@ -124,7 +129,7 @@ local plugins = {
       "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
       {
         -- Make sure to setup it properly if you have lazy=true
-        'MeanderingProgrammer/render-markdown.nvim',
+        "MeanderingProgrammer/render-markdown.nvim",
         opts = {
           file_types = { "markdown", "Avante" },
         },
@@ -144,7 +149,7 @@ local plugins = {
         let g:conjure#extract#tree_sitter#enabled = v:true
         let g:conjure#client#clojure#nrepl#test#raw_out = v:true
         let g:conjure#client#clojure#nrepl#eval#print_buffer_size = 8192
-        let g:conjure#client#clojure#nrepl#test#runner = "kaocha"
+        "let g:conjure#client#clojure#nrepl#test#runner = "kaocha"
         " let g:conjure#client#clojure#nrepl#test#call_suffix = "{:kaocha/color? true :kaocha/reporter kaocha.report/dots :config-file \"tests.edn\"}"
         ]]
     end,
@@ -162,7 +167,7 @@ local plugins = {
     dependencies = {
       "tpope/vim-dispatch",
       "radenling/vim-dispatch-neovim",
-    }
+    },
   },
   -- {
   --   "guns/vim-sexp",
@@ -178,28 +183,28 @@ local plugins = {
     "julienvincent/nvim-paredit",
     ft = { "clojure", "funnel" },
     config = function()
-      require("nvim-paredit").setup({
+      require("nvim-paredit").setup {
         filetypes = { "clojure", "funnel" },
-      })
-    end
+      }
+    end,
   },
   {
     "tpope/vim-surround",
     -- enabled = false,
-    lazy = false
+    lazy = false,
   },
   { -- autoclose and autorename tags
     "windwp/nvim-ts-autotag",
     lazy = false,
     config = function()
-      require('nvim-ts-autotag').setup({
+      require("nvim-ts-autotag").setup {
         opts = {
           -- Defaults
-          enable_close = true,         -- Auto close tags
-          enable_rename = true,        -- Auto rename pairs of tags
-          enable_close_on_slash = true -- Auto close on trailing </
+          enable_close = true, -- Auto close tags
+          enable_rename = true, -- Auto rename pairs of tags
+          enable_close_on_slash = true, -- Auto close on trailing </
         },
-      })
+      }
     end,
   },
   -- "francoiscabrol/ranger.vim",
@@ -217,14 +222,12 @@ local plugins = {
       {
         "luukvbaal/statuscol.nvim",
         config = function()
-          require("statuscol").setup(
-            {
-              foldfunc = "builtin",
-              setopt = true
-            }
-          )
-        end
-      }
+          require("statuscol").setup {
+            foldfunc = "builtin",
+            setopt = true,
+          }
+        end,
+      },
     },
     config = function()
       require("ufo").setup()
@@ -258,10 +261,10 @@ local plugins = {
     },
   },
   {
-    'akinsho/git-conflict.nvim',
+    "akinsho/git-conflict.nvim",
     version = "*",
     config = true,
-    lazy = false
+    lazy = false,
   },
   {
     "harrisoncramer/gitlab.nvim",
@@ -269,13 +272,15 @@ local plugins = {
       "MunifTanjim/nui.nvim",
       "nvim-lua/plenary.nvim",
       "sindrets/diffview.nvim",
-      "stevearc/dressing.nvim",     -- Recommended but not required. Better UI for pickers.
-      "nvim-tree/nvim-web-devicons" -- Recommended but not required. Icons in discussion tree.
+      "stevearc/dressing.nvim", -- Recommended but not required. Better UI for pickers.
+      "nvim-tree/nvim-web-devicons", -- Recommended but not required. Icons in discussion tree.
     },
     enabled = true,
     event = "VeryLazy",
     lazy = false,
-    build = function() require("gitlab.server").build(true) end, -- Builds the Go binary
+    build = function()
+      require("gitlab.server").build(true)
+    end, -- Builds the Go binary
     config = function()
       require("gitlab").setup()
     end,
@@ -283,10 +288,10 @@ local plugins = {
   {
     "NeogitOrg/neogit",
     dependencies = {
-      "nvim-lua/plenary.nvim",         -- required
+      "nvim-lua/plenary.nvim", -- required
       "nvim-telescope/telescope.nvim", -- optional
-      "sindrets/diffview.nvim",        -- optional
-      "ibhagwan/fzf-lua",              -- optional
+      "sindrets/diffview.nvim", -- optional
+      "ibhagwan/fzf-lua", -- optional
     },
     lazy = false,
     config = true,
@@ -295,9 +300,9 @@ local plugins = {
         finder = {
           ["<c-j>"] = "Next",
           ["<c-k>"] = "Previous",
-        }
-      }
-    }
+        },
+      },
+    },
   },
   -- {
   --   "jiangmiao/auto-pairs",
@@ -325,13 +330,13 @@ local plugins = {
         config = function(_, opts)
           require("nvim-autopairs").setup(opts)
 
-          local cond = require('nvim-autopairs.conds')
+          local cond = require "nvim-autopairs.conds"
           local cmp_autopairs = require "nvim-autopairs.completion.cmp"
           require("cmp").event:on("confirm_done", cmp_autopairs.on_confirm_done())
           --require("nvchad.configs.others").autopairs()
           require("nvim-autopairs").get_rule("'")[1].not_filetypes =
-          { "scheme", "lisp", "clojure", "clojurescript", "fennel" }
-          require("nvim-autopairs").get_rules("'")[1]:with_pair(cond.not_after_text("["))
+            { "scheme", "lisp", "clojure", "clojurescript", "fennel" }
+          require("nvim-autopairs").get_rules("'")[1]:with_pair(cond.not_after_text "[")
         end,
       },
 
@@ -368,7 +373,7 @@ local plugins = {
         { name = "buffer" },
         { name = "nvim_lua" },
         { name = "path" },
-        { name = "supermaven" }
+        { name = "supermaven" },
       }
       return config
     end,
