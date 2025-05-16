@@ -3,7 +3,7 @@ local M = {
   base46 = {
     theme = "catppuccin",
     hl_add = {},
-    integrations = {},
+    integrations = { "neogit" },
     changed_themes = {
       catppuccin = {
         polish_hl = {
@@ -53,7 +53,7 @@ local M = {
       { txt = "─", hl = "NvDashLazy", no_gap = true, rep = true },
     },
   },
-  ui     = {
+  ui = {
     lsp_semantic_tokens = true,
     statusline = {
       theme = "default",
@@ -65,8 +65,8 @@ local M = {
         tailwind = true,
         icon = "󱓻",
       },
-    }
-  }
+    },
+  },
 }
 
 -- M.plugins = "plugins"

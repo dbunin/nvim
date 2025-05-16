@@ -212,27 +212,6 @@ local plugins = {
   --   run = "cargo build --release",
   -- },
 
-  -- folding
-  {
-    "kevinhwang91/nvim-ufo",
-    lazy = false,
-    dependencies = {
-      "kevinhwang91/promise-async",
-      -- TODO: statuscol requires nvim 0.9
-      {
-        "luukvbaal/statuscol.nvim",
-        config = function()
-          require("statuscol").setup {
-            foldfunc = "builtin",
-            setopt = true,
-          }
-        end,
-      },
-    },
-    config = function()
-      require("ufo").setup()
-    end,
-  },
   -- motions
   {
     "folke/flash.nvim",
@@ -241,73 +220,65 @@ local plugins = {
     opts = {},
     -- stylua: ignore
     keys = {
-      { "s", mode = { "n", "o", "x" }, function() require("flash").jump() end,       desc = "Flash" },
-      { "S", mode = { "n", "o", "x" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
-      { "r", mode = "o",               function() require("flash").remote() end,     desc = "Remote Flash" },
-      {
-        "R",
-        mode = { "o", "x" },
-        function() require("flash").treesitter_search() end,
-        desc =
-        "Treesitter Search"
-      },
-      {
-        "<c-s>",
-        mode = { "c" },
-        function() require("flash").toggle() end,
-        desc =
-        "Toggle Flash Search"
-      },
+      { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+      { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+      { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+      { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+      { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
     },
   },
+  "NvChad/nvcommunity",
+  { import = "nvcommunity.git.diffview" },
+  { import = "nvcommunity.git.neogit" },
+  { import = "nvcommunity.folds.ufo" },
+  -- { import = "nvchad.blink.lazyspec" },
   {
-    "akinsho/git-conflict.nvim",
-    version = "*",
-    config = true,
-    lazy = false,
+    "hrsh7th/nvim-cmp",
+    enabled = false,
   },
+
   {
-    "harrisoncramer/gitlab.nvim",
+    "saghen/blink.cmp",
+    version = "1.*",
+    event = { "InsertEnter", "CmdLineEnter" },
+
     dependencies = {
-      "MunifTanjim/nui.nvim",
-      "nvim-lua/plenary.nvim",
-      "sindrets/diffview.nvim",
-      "stevearc/dressing.nvim", -- Recommended but not required. Better UI for pickers.
-      "nvim-tree/nvim-web-devicons", -- Recommended but not required. Icons in discussion tree.
+      "rafamadriz/friendly-snippets",
+      {
+        -- snippet plugin
+        "L3MON4D3/LuaSnip",
+        dependencies = "rafamadriz/friendly-snippets",
+        opts = { history = true, updateevents = "TextChanged,TextChangedI" },
+        config = function(_, opts)
+          require("luasnip").config.set_config(opts)
+          require "nvchad.configs.luasnip"
+        end,
+      },
+
+      {
+        "windwp/nvim-autopairs",
+        config = function(_, opts)
+          -- Add enable_check_bracket_line = false to the options
+          opts = vim.tbl_deep_extend("force", opts or {}, { enable_check_bracket_line = false })
+          require("nvim-autopairs").setup(opts)
+
+          local cond = require "nvim-autopairs.conds"
+          local cmp_autopairs = require "nvim-autopairs.completion.cmp"
+          require("cmp").event:on("confirm_done", cmp_autopairs.on_confirm_done())
+          --require("nvchad.configs.others").autopairs()
+          require("nvim-autopairs").get_rule("'")[1].not_filetypes =
+            { "scheme", "lisp", "clojure", "clojurescript", "fennel" }
+          require("nvim-autopairs").get_rules("'")[1]:with_pair(cond.not_after_text "[")
+        end,
+      },
     },
-    enabled = true,
-    event = "VeryLazy",
-    lazy = false,
-    build = function()
-      require("gitlab.server").build(true)
-    end, -- Builds the Go binary
-    config = function()
-      require("gitlab").setup()
+
+    opts_extend = { "sources.default" },
+
+    opts = function()
+      return require "nvchad.blink.config"
     end,
   },
-  {
-    "NeogitOrg/neogit",
-    dependencies = {
-      "nvim-lua/plenary.nvim", -- required
-      "nvim-telescope/telescope.nvim", -- optional
-      "sindrets/diffview.nvim", -- optional
-      "ibhagwan/fzf-lua", -- optional
-    },
-    lazy = false,
-    config = true,
-    opts = {
-      mappings = {
-        finder = {
-          ["<c-j>"] = "Next",
-          ["<c-k>"] = "Previous",
-        },
-      },
-    },
-  },
-  -- {
-  --   "jiangmiao/auto-pairs",
-  --   lazy = false
-  -- },
   {
     "hrsh7th/nvim-cmp",
     event = "InsertEnter",
@@ -320,23 +291,6 @@ local plugins = {
         config = function(_, opts)
           require("luasnip").config.set_config(opts)
           require "nvchad.configs.luasnip"
-        end,
-      },
-
-      -- autopairing of (){}[] etc
-      {
-        "windwp/nvim-autopairs",
-        enabled = true,
-        config = function(_, opts)
-          require("nvim-autopairs").setup(opts)
-
-          local cond = require "nvim-autopairs.conds"
-          local cmp_autopairs = require "nvim-autopairs.completion.cmp"
-          require("cmp").event:on("confirm_done", cmp_autopairs.on_confirm_done())
-          --require("nvchad.configs.others").autopairs()
-          require("nvim-autopairs").get_rule("'")[1].not_filetypes =
-            { "scheme", "lisp", "clojure", "clojurescript", "fennel" }
-          require("nvim-autopairs").get_rules("'")[1]:with_pair(cond.not_after_text "[")
         end,
       },
 
