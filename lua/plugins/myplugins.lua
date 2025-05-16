@@ -257,14 +257,18 @@ local plugins = {
 
       {
         "windwp/nvim-autopairs",
+        opts = {
+          fast_wrap = {},
+          disable_filetype = { "TelescopePrompt", "vim" },
+          enable_check_bracket_line = false,
+        },
         config = function(_, opts)
           -- Add enable_check_bracket_line = false to the options
-          opts = vim.tbl_deep_extend("force", opts or {}, { enable_check_bracket_line = false })
           require("nvim-autopairs").setup(opts)
 
           local cond = require "nvim-autopairs.conds"
-          local cmp_autopairs = require "nvim-autopairs.completion.cmp"
-          require("cmp").event:on("confirm_done", cmp_autopairs.on_confirm_done())
+          -- local cmp_autopairs = require "nvim-autopairs.completion.cmp"
+          -- require("cmp").event:on("confirm_done", cmp_autopairs.on_confirm_done())
           --require("nvchad.configs.others").autopairs()
           require("nvim-autopairs").get_rule("'")[1].not_filetypes =
             { "scheme", "lisp", "clojure", "clojurescript", "fennel" }
