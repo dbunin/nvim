@@ -1,9 +1,8 @@
-
 local autocmd = vim.api.nvim_create_autocmd
 
 local g = vim.g
 g.maplocalleader = ","
-g.ranger_command_override = "ranger --cmd \"set show_hidden=true\""
+g.ranger_command_override = 'ranger --cmd "set show_hidden=true"'
 vim.wo.wrap = false
 vim.wo.relativenumber = true
 
@@ -12,6 +11,8 @@ vim.g.maplocalleader = ","
 vim.g.mapleader = " "
 
 vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+
+vim.g.root_spec = { "lsp", { ".git" }, "cwd" }
 
 -- bootstrap lazy and all plugins
 local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"

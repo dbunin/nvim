@@ -114,21 +114,93 @@ local plugins = {
   },
 
   {
+    "ravitemer/mcphub.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    build = "npm install -g mcp-hub@latest", -- Installs `mcp-hub` node binary globally
+    config = function()
+      require("mcphub").setup {
+        auto_approve = true,
+        extensions = {
+          avante = {
+            make_slash_commands = true, -- make /slash commands from MCP server prompts
+          },
+        },
+      }
+
+      local mcphub = require "mcphub"
+
+      mcphub.add_resource("uix", {
+        name = "uix_doc",
+        uri = "https://raw.githubusercontent.com/pitch-io/uix/refs/heads/master/docs/repomix-output.llm.md",
+        description = "Frontend Clojurescript code using UIX",
+        handler = function(req, res)
+          local path = req.params.path
+          return res:text(vim.fn.readfile(path)):send()
+        end,
+      })
+    end,
+  },
+
+  {
     "yetone/avante.nvim",
     event = "VeryLazy",
     lazy = false,
     opts = {
       -- add any opts here
+      provider = "copilot",
+      hints = { enabled = false },
+      system_prompt = function()
+        local hub = require("mcphub").get_hub_instance()
+        return hub and hub:get_active_servers_prompt() or ""
+      end,
+      custom_tools = function()
+        return {
+          require("mcphub.extensions.avante").mcp_tool(),
+        }
+      end,
     },
     build = "make", -- This is optional, recommended tho. Also note that this will block the startup for a bit since we are compiling bindings in Rust.
+    disabled_tools = {
+      "list_files", -- Built-in file operations
+      "search_files",
+      "read_file",
+      "create_file",
+      "rename_file",
+      "delete_file",
+      "create_dir",
+      "rename_dir",
+      "delete_dir",
+      "bash", -- Built-in terminal access
+    },
     dependencies = {
+      "nvim-treesitter/nvim-treesitter",
       "stevearc/dressing.nvim",
       "nvim-lua/plenary.nvim",
       "MunifTanjim/nui.nvim",
       --- The below dependencies are optional,
       "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
+      "zbirenbaum/copilot.lua", -- for providers='copilot'
       {
-        -- Make sure to setup it properly if you have lazy=true
+        -- support for image pasting
+        "HakonHarnes/img-clip.nvim",
+        event = "VeryLazy",
+        opts = {
+          -- recommended settings
+          default = {
+            embed_image_as_base64 = false,
+            prompt_for_file_name = false,
+            drag_and_drop = {
+              insert_mode = true,
+            },
+            -- required for Windows users
+            use_absolute_path = true,
+          },
+        },
+      },
+      {
+        -- Make sure to set this up properly if you have lazy=true
         "MeanderingProgrammer/render-markdown.nvim",
         opts = {
           file_types = { "markdown", "Avante" },
@@ -227,115 +299,112 @@ local plugins = {
       { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
     },
   },
-  "NvChad/nvcommunity",
+  { "NvChad/nvcommunity" },
   { import = "nvcommunity.git.diffview" },
   { import = "nvcommunity.git.neogit" },
   { import = "nvcommunity.folds.ufo" },
-  -- { import = "nvchad.blink.lazyspec" },
-  {
-    "hrsh7th/nvim-cmp",
-    enabled = false,
-  },
+  { import = "nvchad.blink.lazyspec" },
 
   {
-    "saghen/blink.cmp",
-    version = "1.*",
-    event = { "InsertEnter", "CmdLineEnter" },
-
-    dependencies = {
-      "rafamadriz/friendly-snippets",
-      {
-        -- snippet plugin
-        "L3MON4D3/LuaSnip",
-        dependencies = "rafamadriz/friendly-snippets",
-        opts = { history = true, updateevents = "TextChanged,TextChangedI" },
-        config = function(_, opts)
-          require("luasnip").config.set_config(opts)
-          require "nvchad.configs.luasnip"
-        end,
-      },
-
-      {
-        "windwp/nvim-autopairs",
-        opts = {
-          fast_wrap = {},
-          disable_filetype = { "TelescopePrompt", "vim" },
-          enable_check_bracket_line = false,
-        },
-        config = function(_, opts)
-          -- Add enable_check_bracket_line = false to the options
-          require("nvim-autopairs").setup(opts)
-
-          local cond = require "nvim-autopairs.conds"
-          -- local cmp_autopairs = require "nvim-autopairs.completion.cmp"
-          -- require("cmp").event:on("confirm_done", cmp_autopairs.on_confirm_done())
-          --require("nvchad.configs.others").autopairs()
-          require("nvim-autopairs").get_rule("'")[1].not_filetypes =
-            { "scheme", "lisp", "clojure", "clojurescript", "fennel" }
-          require("nvim-autopairs").get_rules("'")[1]:with_pair(cond.not_after_text "[")
-        end,
-      },
-    },
-
-    opts_extend = { "sources.default" },
-
-    opts = function()
-      return require "nvchad.blink.config"
-    end,
-  },
-  {
-    "hrsh7th/nvim-cmp",
+    "zbirenbaum/copilot.lua",
+    cmd = "Copilot",
     event = "InsertEnter",
-    dependencies = {
-      {
-        -- snippet plugin
-        "L3MON4D3/LuaSnip",
-        dependencies = "rafamadriz/friendly-snippets",
-        opts = { history = true, updateevents = "TextChanged,TextChangedI" },
-        config = function(_, opts)
-          require("luasnip").config.set_config(opts)
-          require "nvchad.configs.luasnip"
-        end,
-      },
-
-      {
-        "supermaven-inc/supermaven-nvim",
-        -- commit = "df3ecf7",
-        event = "BufReadPost",
-        enabled = false,
-        opts = {
-          disable_keymaps = false,
-          disable_inline_completion = false,
-          keymaps = {
-            accept_suggestion = "<C-;>",
-            clear_suggestion = "<Nop>",
-            accept_word = "<C-y>",
-          },
-        },
-      },
-
-      -- cmp sources plugins
-      {
-        "saadparwaiz1/cmp_luasnip",
-        "hrsh7th/cmp-nvim-lua",
-        "hrsh7th/cmp-nvim-lsp",
-        "hrsh7th/cmp-buffer",
-        "hrsh7th/cmp-path",
-      },
+    opts = {
+      suggestion = { enabled = true },
+      panel = { enabled = true },
     },
-    opts = function()
-      local config = require "nvchad.configs.cmp"
-      config.sources = {
-        { name = "nvim_lsp" },
-        { name = "luasnip" },
-        { name = "buffer" },
-        { name = "nvim_lua" },
-        { name = "path" },
-        { name = "supermaven" },
-      }
-      return config
+  },
+  {
+    "windwp/nvim-autopairs",
+    opts = {
+      fast_wrap = {},
+      disable_filetype = { "TelescopePrompt", "vim" },
+      enable_check_bracket_line = false,
+    },
+    config = function(_, opts)
+      -- Add enable_check_bracket_line = false to the options
+      require("nvim-autopairs").setup(opts)
+
+      local cond = require "nvim-autopairs.conds"
+      -- local cmp_autopairs = require "nvim-autopairs.completion.cmp"
+      -- require("cmp").event:on("confirm_done", cmp_autopairs.on_confirm_done())
+      --require("nvchad.configs.others").autopairs()
+      require("nvim-autopairs").get_rule("'")[1].not_filetypes =
+        { "scheme", "lisp", "clojure", "clojurescript", "fennel" }
+      require("nvim-autopairs").get_rules("'")[1]:with_pair(cond.not_after_text "[")
     end,
   },
+  -- {
+  --   "saghen/blink.cmp",
+  --   dependencies = { "fang2hou/blink-copilot" },
+  --   opts = {
+  --     sources = {
+  --       default = { "copilot" },
+  --       providers = {
+  --         copilot = {
+  --           name = "copilot",
+  --           module = "blink-copilot",
+  --           kind = "Copilot",
+  --           score_offset = 100,
+  --           async = true,
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
+  -- {
+  --   "hrsh7th/nvim-cmp",
+  --   event = "InsertEnter",
+  --   dependencies = {
+  --     {
+  --       -- snippet plugin
+  --       "L3MON4D3/LuaSnip",
+  --       dependencies = "rafamadriz/friendly-snippets",
+  --       opts = { history = true, updateevents = "TextChanged,TextChangedI" },
+  --       config = function(_, opts)
+  --         require("luasnip").config.set_config(opts)
+  --         require "nvchad.configs.luasnip"
+  --       end,
+  --     },
+  --
+  --     {
+  --       "supermaven-inc/supermaven-nvim",
+  --       -- commit = "df3ecf7",
+  --       event = "BufReadPost",
+  --       enabled = false,
+  --       opts = {
+  --         disable_keymaps = false,
+  --         disable_inline_completion = false,
+  --         keymaps = {
+  --           accept_suggestion = "<C-;>",
+  --           clear_suggestion = "<Nop>",
+  --           accept_word = "<C-y>",
+  --         },
+  --       },
+  --     },
+  --
+  --     -- cmp sources plugins
+  --     {
+  --       "saadparwaiz1/cmp_luasnip",
+  --       "hrsh7th/cmp-nvim-lua",
+  --       "hrsh7th/cmp-nvim-lsp",
+  --       "hrsh7th/cmp-buffer",
+  --       "hrsh7th/cmp-path",
+  --     },
+  --   },
+  --   opts = function()
+  --     local config = require "nvchad.configs.cmp"
+  --     config.sources = {
+  --       { name = "nvim_lsp" },
+  --       { name = "luasnip" },
+  --       { name = "buffer" },
+  --       { name = "nvim_lua" },
+  --       { name = "path" },
+  --       { name = "supermaven" },
+  --     }
+  --     return config
+  --   end,
+  -- },
   -- database
   -- "tpope/vim-dadbod",
   -- "kristijanhusak/vim-dadbod-ui",

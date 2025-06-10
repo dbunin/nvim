@@ -46,8 +46,6 @@ local function apply_mappings(disabled, general, tabufline)
   end
 end
 
-
-
 local M = {}
 
 M.disabled = {
@@ -67,20 +65,21 @@ M.general = {
     -- fold
     ["zm"] = {
       function()
-        require('ufo').closeAllFolds()
+        require("ufo").closeAllFolds()
       end,
-      "Close all folds"
+      "Close all folds",
     },
     ["zr"] = {
       function()
-        require('ufo').openAllFolds()
+        require("ufo").openAllFolds()
       end,
-      "Close all folds"
+      "Close all folds",
     },
     -- jack-in
     ["<localleader>'"] = {
-      "<cmd>Clj -Sdeps '{:deps {nrepl/nrepl {:mvn/version \"1.0.0\"} cider/cider-nrepl {:mvn/version \"0.30.0\"}} :aliases {:cider/nrepl {:main-opts [\"-m\" \"nrepl.cmdline\" \"--middleware\" \"[cider.nrepl/cider-middleware]\"]}}}' -Mdev:repl:test:cider/nrepl <CR>",
-      "Clojure jack-in" },
+      '<cmd>Clj -Sdeps \'{:deps {nrepl/nrepl {:mvn/version "1.0.0"} cider/cider-nrepl {:mvn/version "0.30.0"}} :aliases {:cider/nrepl {:main-opts ["-m" "nrepl.cmdline" "--middleware" "[cider.nrepl/cider-middleware]"]}}}\' -Mdev:repl:test:cider/nrepl --port 7888 <CR>',
+      "Clojure jack-in",
+    },
     -- window management
     ["<leader>wv"] = { "<C-w>v", "Split pane right" },
     ["<leader>wh"] = { "<C-w>s", "Split pane down" },
@@ -90,41 +89,41 @@ M.general = {
       function()
         require("telescope.builtin").current_buffer_fuzzy_find()
       end,
-      "Search current buffer"
+      "Search current buffer",
     },
     ["<leader>pp"] = {
       function()
-        require 'telescope'.extensions.repo.list {}
+        require("telescope").extensions.repo.list {}
       end,
-      "Search available repos"
+      "Search available repos",
     },
     ["<leader>ra"] = {
       function()
         require("cosmic-ui").rename()
       end,
-      "Rename symbol"
+      "Rename symbol",
     },
     ["<leader>ca"] = {
       function()
         require("cosmic-ui").code_actions()
       end,
-      "Code actions"
+      "Code actions",
     },
     ["<leader>si"] = {
       function()
         require("telescope.builtin").lsp_document_symbols()
       end,
-      "List symbols in current buffer"
+      "List symbols in current buffer",
     },
     ["<leader>cj"] = {
       function()
         require("telescope.builtin").lsp_workspace_symbols()
       end,
-      "List symbols in current project"
+      "List symbols in current project",
     },
     ["<leader>ld"] = {
       function()
-        require('telescope.builtin').diagnostics({ severity_bound = 0 })
+        require("telescope.builtin").diagnostics { severity_bound = 0 }
       end,
       "List diagnostics in current project",
     },
@@ -135,22 +134,25 @@ M.general = {
     --   "Find implementations"
     -- },
     -- buffers
-    ["<leader>gg"] = { function()
-      if vim.g.nvdash_displayed then
-        require("nvchad.tabufline").close_buffer()
-      end
-      vim.cmd "Neogit"
-    end, "Open Neogit" },
+    ["<leader>gg"] = {
+      function()
+        if vim.g.nvdash_displayed then
+          require("nvchad.tabufline").close_buffer()
+        end
+        vim.cmd "Neogit"
+      end,
+      "Open Neogit",
+    },
     -- database
     ["<leader>du"] = { "<cmd> DBUIToggle<CR>", "Toggle dadbod ui" },
 
     -- autopair
     ["<localleader>w"] = {
       function()
-        local paredit = require("nvim-paredit")
+        local paredit = require "nvim-paredit"
         -- place cursor and set mode to `insert`
         paredit.cursor.place_cursor(
-        -- wrap element under cursor with `( ` and `)`
+          -- wrap element under cursor with `( ` and `)`
           paredit.wrap.wrap_element_under_cursor("( ", ")"),
           -- cursor placement opts
           { placement = "inner_start", mode = "insert" }
@@ -161,7 +163,7 @@ M.general = {
 
     ["<localleader>W"] = {
       function()
-        local paredit = require("nvim-paredit")
+        local paredit = require "nvim-paredit"
         paredit.cursor.place_cursor(
           paredit.wrap.wrap_element_under_cursor("(", ")"),
           { placement = "inner_end", mode = "insert" }
@@ -173,7 +175,7 @@ M.general = {
     -- same as above but for enclosing form
     ["<localleader>i"] = {
       function()
-        local paredit = require("nvim-paredit")
+        local paredit = require "nvim-paredit"
         paredit.cursor.place_cursor(
           paredit.wrap.wrap_enclosing_form_under_cursor("( ", ")"),
           { placement = "inner_start", mode = "insert" }
@@ -184,14 +186,14 @@ M.general = {
 
     ["<localleader>I"] = {
       function()
-        local paredit = require("nvim-paredit")
+        local paredit = require "nvim-paredit"
         paredit.cursor.place_cursor(
           paredit.wrap.wrap_enclosing_form_under_cursor("(", ")"),
           { placement = "inner_end", mode = "insert" }
         )
       end,
       "Wrap form insert tail",
-    }
+    },
   },
 }
 
@@ -210,7 +212,7 @@ M.tabufline = {
       end,
       "goto next buffer",
     },
-  }
+  },
 }
 
 apply_mappings(M.disabled, M.general, M.tabufline)
